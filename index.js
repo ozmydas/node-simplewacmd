@@ -52,16 +52,20 @@ async function mainmenu() {
     switch (menu.menu) {
       case "send to single contact":
         await run("single");
+        break;
       case "send to multiple contacts":
         await run("multi");
+        break;
       case "tes":
         await backtomain();
+        break;
       case "exit":
         clear();
         // wa.close();
         setTimeout(() => {
           process.exit(1);
         }, 500);
+        break;
       default:
         indevelop(menu.menu)
     }
