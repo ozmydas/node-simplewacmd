@@ -16,7 +16,7 @@ const wa = new waselenium();
 
 /*************/
 
-function clear(){
+function clear() {
   console.clear();
 }
 
@@ -52,11 +52,16 @@ async function mainmenu() {
     switch (menu.menu) {
       case "send to single contact":
         await run("single");
+      case "send to multiple contacts":
+        await run("multi");
       case "tes":
         await backtomain();
       case "exit":
         clear();
-        process.exit(1);
+        // wa.close();
+        setTimeout(() => {
+          process.exit(1);
+        }, 500);
       default:
         indevelop(menu.menu)
     }
@@ -76,18 +81,25 @@ async function run(mode) {
     switch (mode) {
       case "single":
         await waExecuteSingle();
+        break;
+      case "multi":
+        await waExecuteMulti();
+        break;
       default:
         indevelop("5693");
     }
 
   } catch (err) {
     console.log(err)
+    wa.close();
   } finally {
     // console.log(chalk.yellow("END PHASE : Closing Webdiver"));
     // wa.close();
   }
 
 }
+
+/********************************************/
 
 async function waExecuteSingle() {
   try {
@@ -111,6 +123,42 @@ async function waExecuteSingle() {
     wa.close
   }
 } // end func
+
+
+
+async function waExecuteMulti() {
+  try {
+    let phones = await inquirer.askPhoneMulti();
+    phones = phones.phone;
+    phones = phones.split(",");
+
+    const message = await inquirer.askMessage();
+
+    
+    await phones.forEach(async function(element, index){
+        phone = element.replaceAll(/\s/g,'')
+        // console.log(phone);
+
+        wa.set_phone(phone);
+        await wa.search();
+
+        wa.set_message(message.message);
+        await wa.send();
+    });
+
+    let isAgain = await inquirer.askAgain();
+    if (isAgain.again_confirm) {
+      console.log(chalk.yellow("---------------------------------------"))
+      await waExecuteSingle();
+    } else {
+      await backtomain();
+    }
+  } catch (err) {
+    console.log(err)
+    wa.close
+  }
+} // end func
+
 
 async function ask() {
   const phone = await inquirer.askPhone();
